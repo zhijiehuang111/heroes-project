@@ -44,7 +44,8 @@ heroes-project/
 │       ├── layout.tsx               # Heroes Layout（包含 Hero List）
 │       ├── page.tsx                 # /heroes 頁面（僅顯示 Hero List，無 Profile）
 │       └── [heroId]/
-│           └── page.tsx             # /heroes/:heroId 頁面（顯示 Hero Profile）
+│           ├── page.tsx             # /heroes/:heroId 頁面（fetch profile，傳入 HeroProfile）
+│           └── loading.tsx          # HeroProfile 載入骨架
 ├── components/
 │   ├── HeroList.tsx                 # Hero 列表元件
 │   ├── HeroCard.tsx                 # 單一 Hero 卡片元件
@@ -54,11 +55,13 @@ heroes-project/
 │   ├── api.ts                       # API 請求封裝
 │   └── types.ts                     # TypeScript 型別定義
 ├── hooks/
-│   └── useHeroProfile.ts           # Hero Profile 資料取得與編輯邏輯
+│   └── useHeroProfile.ts           # Hero Profile 編輯邏輯（increment/decrement/save）
 ├── docs/
 │   ├── requirements.md
 │   └── plan/
-│       └── structure.md            # (本文件)
+│       ├── structure.md            # (本文件)
+│       ├── plan-basic-ui.md       # Phase 1：基礎 UI 實作計劃
+│       └── plan-profile.md        # Phase 2：HeroProfile 重構 + 互動邏輯
 ├── public/
 ├── package.json
 ├── tsconfig.json
@@ -135,11 +138,11 @@ type PatchHeroProfilePayload = HeroProfile;
 ### 5. `components/HeroProfile.tsx` — 能力值編輯面板
 
 - **Client Component**（需要互動狀態管理）
-- 呼叫 `useHeroProfile` hook 取得與管理能力值
+- 接收 `heroId` 和 `initialProfile` props（由 `page.tsx` server-side fetch 後傳入）
+- 呼叫 `useHeroProfile` hook 管理編輯狀態
 - 顯示四項能力值，各搭配 `StatControl` 元件
-- 顯示「剩餘點數」（初始為 0，增減時相應變化）
-- 「儲存」按鈕，點擊後呼叫 PATCH API
-- 驗證：能力值不得 < 0，總和必須與原始值相同（剩餘點數 = 0 才能儲存）
+- 顯示「剩餘點數」
+- 「儲存」按鈕：有修改且剩餘點數 = 0 時可點，否則 disabled
 
 ### 6. `components/StatControl.tsx` — 能力值控制
 
@@ -150,14 +153,12 @@ type PatchHeroProfilePayload = HeroProfile;
 
 ### 7. `hooks/useHeroProfile.ts` — Profile 邏輯 Hook
 
-- 以 `heroId` 為參數，負責：
-  - 呼叫 API 取得 profile 資料
-  - 計算原始能力值總和
-  - 管理編輯中的能力值狀態
-  - 計算剩餘點數 = 原始總和 - 目前總和
+- 接收 `heroId` 和 `initialProfile`，負責：
+  - 管理編輯中的能力值狀態（`profile`）和儲存基準（`baseProfile`）
+  - 計算剩餘點數 = `baseProfile` 總和 - `profile` 總和
+  - 計算 `isDirty`：`profile` 與 `baseProfile` 是否不同
   - 提供 `increment(stat)` / `decrement(stat)` 方法
-  - 提供 `save()` 方法送出 PATCH 請求
-  - heroId 變化時重新取得資料
+  - 提供 `save()` 方法送出 PATCH 請求，成功後更新 `baseProfile`
 
 ---
 
@@ -185,7 +186,7 @@ type PatchHeroProfilePayload = HeroProfile;
 - 編輯時即時計算 `currentTotal`，剩餘點數 = `originalTotal - currentTotal`
 - `+` 按鈕：剩餘點數 > 0 時可用
 - `-` 按鈕：該能力值 > 0 時可用
-- 儲存按鈕：剩餘點數 = 0 時才可提交
+- 儲存按鈕：有修改（`isDirty`）且剩餘點數 = 0 時才可提交
 
 ### 4. 響應式設計
 
