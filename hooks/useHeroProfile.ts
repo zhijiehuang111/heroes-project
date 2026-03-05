@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { patchHeroProfile } from "@/lib/api";
 import type { HeroProfile } from "@/lib/types";
 
@@ -40,6 +41,9 @@ export function useHeroProfile(heroId: string, initialProfile: HeroProfile) {
     try {
       await patchHeroProfile(heroId, profile);
       setBaseProfile(profile);
+      toast.success("儲存成功！");
+    } catch {
+      toast.error("儲存失敗，請稍後再試。");
     } finally {
       setIsSaving(false);
     }

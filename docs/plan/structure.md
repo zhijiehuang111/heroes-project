@@ -45,6 +45,7 @@ heroes-project/
 │       ├── page.tsx                 # /heroes 頁面（僅顯示 Hero List，無 Profile）
 │       └── [heroId]/
 │           ├── page.tsx             # /heroes/:heroId 頁面（fetch profile，傳入 HeroProfile）
+│           ├── error.tsx            # HeroProfile 錯誤邊界（重試按鈕）
 │           └── loading.tsx          # HeroProfile 載入骨架
 ├── components/
 │   ├── HeroList.tsx                 # Hero 列表元件
@@ -202,13 +203,10 @@ type PatchHeroProfilePayload = HeroProfile;
 
 ---
 
-## 預計不引入額外第三方套件
+## 第三方套件
 
-目前規劃僅使用專案建立時已包含的套件（Next.js、React、Tailwind CSS、TypeScript），不額外安裝其他 library。原因：
+| 套件             | 用途                         |
+| ---------------- | ---------------------------- |
+| react-hot-toast  | 儲存成功/失敗的 toast 通知   |
 
-- **狀態管理**：需求相對單純，React 內建的 `useState` + custom hook 足以應付
-- **資料請求**：使用原生 `fetch` 搭配 Next.js 的快取機制即可
-- **樣式**：Tailwind CSS 已足夠處理所有 UI 需求
-- **路由**：Next.js App Router 內建
-
-若後續開發中發現確實需要，再評估引入。
+其餘功能（狀態管理、資料請求、樣式、路由）皆使用 Next.js / React / Tailwind 內建機制。
