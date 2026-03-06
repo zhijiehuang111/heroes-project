@@ -1,0 +1,142 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { renderHook, act } from "@testing-library/react";
+import { useHeroProfile } from "@/hooks/useHeroProfile";
+
+vi.mock("@/lib/api", () => ({
+  patchHeroProfile: vi.fn(),
+}));
+
+vi.mock("react-hot-toast", () => ({
+  default: { success: vi.fn(), error: vi.fn() },
+}));
+
+import { patchHeroProfile } from "@/lib/api";
+import toast from "react-hot-toast";
+
+const mockPatch = vi.mocked(patchHeroProfile);
+
+const initialProfile = { str: 5, int: 3, agi: 4, luk: 2 };
+
+describe("useHeroProfile", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("初始狀態: remainingPoints 為 0, isDirty 為 false", () => {
+    const { result } = renderHook(() => useHeroProfile("1", initialProfile));
+    expect(result.current.remainingPoints).toBe(0);
+    expect(result.current.isDirty).toBe(false);
+  });
+
+  it("increment: 增加能力值, 剩餘點數減少", () => {
+    const { result } = renderHook(() =>
+      useHeroProfile("1", { str: 5, int: 3, agi: 4, luk: 2 }),
+    );
+
+    act(() => result.current.decrement("str"));
+    expect(result.current.profile.str).toBe(4);
+    expect(result.current.remainingPoints).toBe(1);
+
+    act(() => result.current.increment("int"));
+    expect(result.current.profile.int).toBe(4);
+    expect(result.current.remainingPoints).toBe(0);
+  });
+
+  it("increment 邊界: 剩餘點數為 0 時無效", () => {
+    const { result } = renderHook(() => useHeroProfile("1", initialProfile));
+
+    act(() => result.current.increment("str"));
+    expect(result.current.profile.str).toBe(5);
+  });
+
+  it("decrement 邊界: 能力值為 0 時無效", () => {
+    const { result } = renderHook(() =>
+      useHeroProfile("1", { str: 0, int: 3, agi: 4, luk: 7 }),
+    );
+
+    act(() => result.current.decrement("str"));
+    expect(result.current.profile.str).toBe(0);
+  });
+
+  it("isDirty: 修改後為 true, 還原後回到 false", () => {
+    const { result } = renderHook(() => useHeroProfile("1", initialProfile));
+
+    act(() => result.current.decrement("str"));
+    expect(result.current.isDirty).toBe(true);
+
+    act(() => result.current.increment("str"));
+    expect(result.current.isDirty).toBe(false);
+  });
+
+  it("save: remainingPoints !== 0 時不送出", async () => {
+    const { result } = renderHook(() => useHeroProfile("1", initialProfile));
+
+    act(() => result.current.decrement("str"));
+
+    await act(() => result.current.save());
+    expect(mockPatch).not.toHaveBeenCalled();
+  });
+
+  it("save: 未修改時不送出", async () => {
+    const { result } = renderHook(() => useHeroProfile("1", initialProfile));
+
+    await act(() => result.current.save());
+    expect(mockPatch).not.toHaveBeenCalled();
+  });
+
+  it("save 成功: 呼叫 API 並顯示成功 toast", async () => {
+    mockPatch.mockResolvedValue(undefined);
+
+    const { result } = renderHook(() => useHeroProfile("1", initialProfile));
+
+    act(() => result.current.decrement("str"));
+    act(() => result.current.increment("int"));
+
+    await act(() => result.current.save());
+
+    expect(mockPatch).toHaveBeenCalledWith("1", {
+      str: 4,
+      int: 4,
+      agi: 4,
+      luk: 2,
+    });
+    expect(toast.success).toHaveBeenCalled();
+    // save 後 isDirty 應為 false (baseProfile 已更新)
+    expect(result.current.isDirty).toBe(false);
+  });
+
+  it("save: isSaving 期間再次呼叫不重複送出", async () => {
+    // 讓 patchHeroProfile 永遠不 resolve，模擬請求進行中
+    mockPatch.mockReturnValue(new Promise(() => {}));
+
+    const { result } = renderHook(() => useHeroProfile("1", initialProfile));
+
+    act(() => result.current.decrement("str"));
+    act(() => result.current.increment("int"));
+
+    // 不 return Promise 給 act，避免等待永遠不 resolve 的 Promise
+    act(() => {
+      result.current.save();
+    });
+    expect(result.current.isSaving).toBe(true);
+
+    // 第二次 save，應被擋下
+    await act(() => result.current.save());
+    expect(mockPatch).toHaveBeenCalledTimes(1);
+  });
+
+  it("save 失敗: 顯示錯誤 toast", async () => {
+    mockPatch.mockRejectedValue(new Error("network error"));
+
+    const { result } = renderHook(() => useHeroProfile("1", initialProfile));
+
+    act(() => result.current.decrement("str"));
+    act(() => result.current.increment("int"));
+
+    await act(() => result.current.save());
+
+    expect(toast.error).toHaveBeenCalled();
+    // 失敗後 isDirty 仍為 true
+    expect(result.current.isDirty).toBe(true);
+  });
+});
