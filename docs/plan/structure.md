@@ -57,14 +57,20 @@ heroes-project/
 │   └── types.ts                     # TypeScript 型別定義
 ├── hooks/
 │   └── useHeroProfile.ts           # Hero Profile 編輯邏輯（increment/decrement/save）
+├── __tests__/
+│   ├── setup.ts                   # jest-dom matcher 註冊 + cleanup
+│   ├── useHeroProfile.test.ts     # hook 邏輯測試
+│   └── HeroProfile.test.tsx       # 元件整合測試
 ├── docs/
 │   ├── requirements.md
 │   └── plan/
 │       ├── structure.md            # (本文件)
 │       ├── plan-basic-ui.md       # Phase 1：基礎 UI 實作計劃
-│       └── plan-profile.md        # Phase 2：HeroProfile 重構 + 互動邏輯
+│       ├── plan-profile.md        # Phase 2：HeroProfile 重構 + 互動邏輯
+│       └── plan-testing.md        # Phase 3：測試計劃
 ├── public/
 ├── package.json
+├── vitest.config.ts                # Vitest 設定
 ├── tsconfig.json
 ├── next.config.ts
 ├── eslint.config.mjs
