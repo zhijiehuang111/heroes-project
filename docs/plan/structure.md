@@ -40,11 +40,13 @@ heroes-project/
 │   ├── globals.css                  # 全域樣式
 │   ├── layout.tsx                   # Root Layout (html, body, 字體)
 │   ├── page.tsx                     # 根路徑 → redirect 到 /heroes
+│   ├── not-found.tsx                # 全域 404 頁面（返回英雄列表按鈕）
 │   └── heroes/
 │       ├── layout.tsx               # Heroes Layout（包含 Hero List）
 │       ├── page.tsx                 # /heroes 頁面（僅顯示 Hero List，無 Profile）
 │       └── [heroId]/
 │           ├── page.tsx             # /heroes/:heroId 頁面（fetch profile，傳入 HeroProfile）
+│           ├── not-found.tsx        # 英雄不存在時的提示（API 回傳 404）
 │           ├── error.tsx            # HeroProfile 錯誤邊界（重試按鈕）
 │           └── loading.tsx          # HeroProfile 載入骨架
 ├── components/
@@ -130,7 +132,7 @@ type PatchHeroProfilePayload = HeroProfile;
 | 函式                                | HTTP Method | 端點                      | 說明               |
 | ----------------------------------- | ----------- | ------------------------- | ------------------ |
 | `fetchHeroes()`                     | GET         | `/heroes`                 | 取得所有英雄列表   |
-| `fetchHeroProfile(heroId)`          | GET         | `/heroes/:heroId/profile` | 取得單一英雄能力值 |
+| `fetchHeroProfile(heroId)`          | GET         | `/heroes/:heroId/profile` | 取得單一英雄能力值（404 回傳 `null`） |
 | `patchHeroProfile(heroId, profile)` | PATCH       | `/heroes/:heroId/profile` | 更新英雄能力值     |
 
 ### 3. `components/HeroList.tsx` — Hero 列表
