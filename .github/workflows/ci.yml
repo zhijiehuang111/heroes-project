@@ -32,5 +32,8 @@ jobs:
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
+      - name: Wake up Heroku API
+        run: curl -m 30 -s "https://hahow-recruit.herokuapp.com/heroes" > /dev/null || echo "API wakeup finished"
+
       - name: E2E Test
         run: npm run test:e2e
