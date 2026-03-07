@@ -18,6 +18,7 @@ export default function HeroProfile({
     remainingPoints,
     isDirty,
     isSaving,
+    hasNegative,
     increment,
     decrement,
     save,
@@ -30,7 +31,7 @@ export default function HeroProfile({
     { label: "LUK", key: "luk" as const },
   ];
 
-  const canSave = isDirty && remainingPoints === 0 && !isSaving;
+  const canSave = isDirty && remainingPoints === 0 && !isSaving && !hasNegative;
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg shadow-sm px-10 py-6">
