@@ -23,6 +23,8 @@ export function useHeroProfile(heroId: string, initialProfile: HeroProfile) {
     profile.int !== baseProfile.int ||
     profile.agi !== baseProfile.agi ||
     profile.luk !== baseProfile.luk;
+  const hasNegative =
+    profile.str < 0 || profile.int < 0 || profile.agi < 0 || profile.luk < 0;
 
   function increment(stat: StatKey) {
     if (remainingPoints <= 0) return;
@@ -36,7 +38,7 @@ export function useHeroProfile(heroId: string, initialProfile: HeroProfile) {
 
   // 儲存成功後更新 baseProfile
   async function save() {
-    if (remainingPoints !== 0 || !isDirty || isSaving) return;
+    if (remainingPoints !== 0 || !isDirty || isSaving || hasNegative) return;
     setIsSaving(true);
     try {
       await patchHeroProfile(heroId, profile);
@@ -54,6 +56,7 @@ export function useHeroProfile(heroId: string, initialProfile: HeroProfile) {
     remainingPoints,
     isDirty,
     isSaving,
+    hasNegative,
     increment,
     decrement,
     save,

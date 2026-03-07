@@ -86,7 +86,6 @@ describe("useHeroProfile", () => {
 
   it("save 成功: 呼叫 API 並顯示成功 toast", async () => {
     mockPatch.mockResolvedValue(undefined);
-
     const { result } = renderHook(() => useHeroProfile("1", initialProfile));
 
     act(() => result.current.decrement("str"));
@@ -123,6 +122,48 @@ describe("useHeroProfile", () => {
     // 第二次 save，應被擋下
     await act(() => result.current.save());
     expect(mockPatch).toHaveBeenCalledTimes(1);
+  });
+
+  it("save: profile 含負數時即使總和不變也不送出", async () => {
+    // API 回傳含負數的 profile（總和 = 10）
+    const negativeProfile = { str: -2, int: 5, agi: 4, luk: 3 };
+    const { result } = renderHook(() => useHeroProfile("1", negativeProfile));
+
+    expect(result.current.hasNegative).toBe(true);
+
+    // 調整數值但 str 仍為負數
+    act(() => result.current.decrement("luk"));
+    act(() => result.current.increment("str"));
+    expect(result.current.profile.str).toBe(-1);
+    expect(result.current.remainingPoints).toBe(0);
+    expect(result.current.isDirty).toBe(true);
+
+    await act(() => result.current.save());
+    expect(mockPatch).not.toHaveBeenCalled();
+  });
+
+  it("save: 負數 profile 加到全部 >= 0 後可送出", async () => {
+    mockPatch.mockResolvedValue(undefined);
+    const negativeProfile = { str: -2, int: 5, agi: 4, luk: 3 };
+    const { result } = renderHook(() => useHeroProfile("1", negativeProfile));
+
+    // 把 str 從 -2 加到 0
+    act(() => result.current.decrement("int"));
+    act(() => result.current.decrement("int"));
+    act(() => result.current.increment("str"));
+    act(() => result.current.increment("str"));
+
+    expect(result.current.profile.str).toBe(0);
+    expect(result.current.hasNegative).toBe(false);
+    expect(result.current.remainingPoints).toBe(0);
+
+    await act(() => result.current.save());
+    expect(mockPatch).toHaveBeenCalledWith("1", {
+      str: 0,
+      int: 3,
+      agi: 4,
+      luk: 3,
+    });
   });
 
   it("save 失敗: 顯示錯誤 toast", async () => {
