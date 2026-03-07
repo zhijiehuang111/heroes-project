@@ -1,4 +1,5 @@
 import { defineConfig } from "vitest/config";
+import { configDefaults } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import tsconfigPaths from "vite-tsconfig-paths";
 
@@ -7,5 +8,6 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     setupFiles: ["./__tests__/setup.ts"],
+    exclude: [...configDefaults.exclude, "e2e/**"],
   },
 });
