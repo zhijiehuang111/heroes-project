@@ -11,11 +11,14 @@ export async function fetchHeroes(): Promise<Hero[]> {
   return res.json();
 }
 
-export async function fetchHeroProfile(heroId: string): Promise<HeroProfile> {
+export async function fetchHeroProfile(
+  heroId: string,
+): Promise<HeroProfile | null> {
   const res = await fetch(`${BASE_URL}/heroes/${heroId}/profile`, {
     headers: { Accept: "application/json", "Content-Type": "application/json" },
     next: { revalidate: 0 },
   });
+  if (res.status === 404) return null;
   if (!res.ok) throw new Error(`Failed to fetch profile for hero ${heroId}`);
   return res.json();
 }
