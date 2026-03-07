@@ -61,6 +61,8 @@ heroes-project/
 │   ├── setup.ts                   # jest-dom matcher 註冊 + cleanup
 │   ├── useHeroProfile.test.ts     # hook 邏輯測試
 │   └── HeroProfile.test.tsx       # 元件整合測試
+├── e2e/
+│   └── hero-profile.spec.ts      # E2E happy path 測試（Playwright）
 ├── docs/
 │   ├── requirements.md
 │   └── plan/
@@ -71,6 +73,7 @@ heroes-project/
 ├── public/
 ├── package.json
 ├── vitest.config.ts                # Vitest 設定
+├── playwright.config.ts            # Playwright E2E 設定（Chromium only）
 ├── tsconfig.json
 ├── next.config.ts
 ├── eslint.config.mjs
