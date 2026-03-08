@@ -32,6 +32,7 @@ npx playwright install chromium
 # 若在 Linux 環境，建議加上 --with-deps 以自動安裝缺少的系統函式庫
 npx playwright install --with-deps chromium
 
+npm run build                                   # E2E 需要 production build
 npm run test:e2e                                # E2E 測試 (Playwright)
 # 可加 --headed 開啟瀏覽器畫面：npm run test:e2e -- --headed
 ```
