@@ -45,7 +45,7 @@ export default function HeroProfile({
               onIncrement={() => increment(key)}
               onDecrement={() => decrement(key)}
               canIncrement={remainingPoints > 0}
-              canDecrement={profile[key] > 0}
+              canDecrement={profile[key] > 0 && !isSaving}
             />
           ))}
         </div>
