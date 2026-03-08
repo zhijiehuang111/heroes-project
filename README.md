@@ -37,6 +37,8 @@ npm run test:e2e                                # E2E 測試 (Playwright)
 # 可加 --headed 開啟瀏覽器畫面：npm run test:e2e -- --headed
 ```
 
+> **注意事項**：在部分機器的 E2E 環境中，Playwright 的 Chromium 可能因瀏覽器安全性限制（如 CORS preflight 機制）導致 PATCH 失敗，但手動於開發環境操作皆完全正常。若遇到此問題，建議優先參考 Vitest 單元與整合測試。
+
 ## 資料夾架構
 
 ```
