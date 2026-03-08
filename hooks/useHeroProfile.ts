@@ -10,7 +10,6 @@ type StatKey = keyof HeroProfile;
 export function useHeroProfile(heroId: string, initialProfile: HeroProfile) {
   const [profile, setProfile] = useState<HeroProfile>(initialProfile);
 
-  // 儲存初始值，用來判斷 isDirty。儲存成功後更新
   const [baseProfile, setBaseProfile] = useState<HeroProfile>(initialProfile);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -36,7 +35,6 @@ export function useHeroProfile(heroId: string, initialProfile: HeroProfile) {
     setProfile((prev) => ({ ...prev, [stat]: prev[stat] - 1 }));
   }
 
-  // 儲存成功後更新 baseProfile
   async function save() {
     if (remainingPoints !== 0 || !isDirty || isSaving || hasNegative) return;
     setIsSaving(true);
