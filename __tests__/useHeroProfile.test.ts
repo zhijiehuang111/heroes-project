@@ -100,7 +100,6 @@ describe("useHeroProfile", () => {
       luk: 2,
     });
     expect(toast.success).toHaveBeenCalled();
-    // save 後 isDirty 應為 false (baseProfile 已更新)
     expect(result.current.isDirty).toBe(false);
   });
 
@@ -119,19 +118,16 @@ describe("useHeroProfile", () => {
     });
     expect(result.current.isSaving).toBe(true);
 
-    // 第二次 save，應被擋下
     await act(() => result.current.save());
     expect(mockPatch).toHaveBeenCalledTimes(1);
   });
 
   it("save: profile 含負數時即使總和不變也不送出", async () => {
-    // API 回傳含負數的 profile（總和 = 10）
     const negativeProfile = { str: -2, int: 5, agi: 4, luk: 3 };
     const { result } = renderHook(() => useHeroProfile("1", negativeProfile));
 
     expect(result.current.hasNegative).toBe(true);
 
-    // 調整數值但 str 仍為負數
     act(() => result.current.decrement("luk"));
     act(() => result.current.increment("str"));
     expect(result.current.profile.str).toBe(-1);
@@ -147,7 +143,6 @@ describe("useHeroProfile", () => {
     const negativeProfile = { str: -2, int: 5, agi: 4, luk: 3 };
     const { result } = renderHook(() => useHeroProfile("1", negativeProfile));
 
-    // 把 str 從 -2 加到 0
     act(() => result.current.decrement("int"));
     act(() => result.current.decrement("int"));
     act(() => result.current.increment("str"));
@@ -177,7 +172,6 @@ describe("useHeroProfile", () => {
     await act(() => result.current.save());
 
     expect(toast.error).toHaveBeenCalled();
-    // 失敗後 isDirty 仍為 true
     expect(result.current.isDirty).toBe(true);
   });
 });
