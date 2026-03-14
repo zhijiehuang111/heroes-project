@@ -7,6 +7,14 @@ const nextConfig: NextConfig = {
       { protocol: "http", hostname: "**" },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: "/api/heroes/:path*",
+        destination: "https://hahow-recruit.herokuapp.com/heroes/:path*",
+      },
+    ];
+  },
 };
 
 export default nextConfig;

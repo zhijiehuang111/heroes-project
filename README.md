@@ -38,6 +38,8 @@ npm run test:e2e                                # E2E 測試 (Playwright)
 ```
 
 > **注意事項**：在部分機器的 E2E 環境中，Playwright 的 Chromium 可能因瀏覽器安全性限制（如 CORS preflight 機制）導致 PATCH 失敗，但手動於開發環境操作皆完全正常。若遇到此問題，建議優先參考 Vitest 單元與整合測試。
+>
+> **更新**：已透過 Next.js `rewrites` 將 PATCH 請求經由 Next.js 伺服器轉發至外部 API，避開瀏覽器的 CORS 限制。
 
 ## 資料夾架構
 
