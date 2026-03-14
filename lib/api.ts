@@ -27,7 +27,7 @@ export async function patchHeroProfile(
   heroId: string,
   payload: PatchHeroProfilePayload,
 ): Promise<void> {
-  const res = await fetch(`${BASE_URL}/heroes/${heroId}/profile`, {
+  const res = await fetch(`/api/heroes/${heroId}/profile`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
